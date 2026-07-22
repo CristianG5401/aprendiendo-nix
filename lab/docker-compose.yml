@@ -1,0 +1,21 @@
+services:
+  nix:
+    image: nixos/nix:latest
+    container_name: nix-study-lab
+    hostname: nix-study-lab
+    working_dir: /workspace
+    command: ["sh", "-lc", "echo 'Nix study lab listo. Usa: docker compose exec nix sh'; sleep infinity"]
+    tty: true
+    stdin_open: true
+    volumes:
+      # Monta todo el curso dentro del contenedor para practicar con los mismos archivos.
+      - ..:/workspace
+      # Persiste el Nix store entre reinicios del contenedor.
+      - nix-store:/nix
+      # Activa comandos modernos como `nix shell`, `nix flake`, etc.
+      - ./nix.conf:/etc/nix/nix.conf:ro
+    environment:
+      NIX_CONFIG: "experimental-features = nix-command flakes"
+
+volumes:
+  nix-store:

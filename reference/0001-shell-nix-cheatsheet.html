@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Referencia — shell.nix básico</title>
+  <link rel="stylesheet" href="../assets/teach.css">
+</head>
+<body>
+<main>
+  <p class="kicker">Referencia rápida</p>
+  <h1><code>shell.nix</code> básico</h1>
+  <section class="card">
+    <h2>Plantilla mínima</h2>
+    <pre><code>let
+  nixpkgs = fetchTarball "https://github.com/NixOS/nixpkgs/tarball/nixos-24.05";
+  pkgs = import nixpkgs { config = {}; overlays = []; };
+in
+
+pkgs.mkShellNoCC {
+  packages = with pkgs; [
+    curl
+    git
+    jq
+  ];
+
+  MY_VAR = "valor";
+
+  shellHook = ''
+    echo "Shell lista"
+  '';
+}</code></pre>
+  </section>
+  <section class="card">
+    <h2>Comandos</h2>
+    <ul>
+      <li><code>nix-shell</code>: entra en la shell descrita por <code>shell.nix</code>.</li>
+      <li><code>exit</code>: sale de la shell.</li>
+      <li><code>which jq</code>: verifica desde dónde viene una herramienta.</li>
+    </ul>
+  </section>
+  <section class="card">
+    <h2>Regla mental</h2>
+    <p><strong>Si lo necesitas para trabajar en ese proyecto o administrar ese entorno, decláralo en el archivo.</strong></p>
+  </section>
+</main>
+</body>
+</html>

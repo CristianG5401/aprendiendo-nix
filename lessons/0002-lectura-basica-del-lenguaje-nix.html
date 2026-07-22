@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>0002 — Leer Nix sin miedo: let, sets y listas</title>
+  <link rel="stylesheet" href="../assets/teach.css">
+</head>
+<body>
+<main>
+  <p class="kicker">Lección 0002 · Lenguaje Nix mínimo</p>
+  <h1>Leer Nix sin miedo: <code>let</code>, sets y listas</h1>
+  <p class="subtitle">Objetivo: entender la sintaxis mínima que ya apareció en tu <code>shell.nix</code>, usando comparaciones con JavaScript/TypeScript.</p>
+
+  <section class="card">
+    <h2>Por qué esta lección existe</h2>
+    <p>
+      Completaste la lección 0001 y apareció una duda correcta: <code>let ... in</code>. Antes de avanzar a
+      <code>flake.nix</code>, vamos a calibrar el auspex sintáctico: Nix no es Bash, no es JSON puro y tampoco es TypeScript,
+      pero puedes leerlo con herramientas mentales parecidas.
+    </p>
+    <p><strong>Regla del curso desde ahora:</strong> no asumiremos que sabes el lenguaje Nix. Cada símbolo nuevo será explicado.</p>
+  </section>
+
+  <section class="card">
+    <h2>1. Nix evalúa expresiones, no ejecuta pasos</h2>
+    <p>En JavaScript/TypeScript estás acostumbrado a instrucciones:</p>
+    <pre><code>const x = 1;
+const y = 2;
+console.log(x + y);</code></pre>
+    <p>En Nix normalmente escribes una expresión que produce un valor:</p>
+    <pre><code>let
+  x = 1;
+  y = 2;
+in
+  x + y</code></pre>
+    <p>Resultado:</p>
+    <pre><code>3</code></pre>
+    <p class="small">Fuente: nix.dev explica que un archivo <code>.nix</code> contiene una expresión Nix, y evaluarla produce un valor.</p>
+  </section>
+
+  <section class="card">
+    <h2>2. <code>let ... in</code>: variables locales para una expresión</h2>
+    <p>Forma general:</p>
+    <pre><code>let
+  nombre = valor;
+  otroNombre = otroValor;
+in
+  expresionFinal</code></pre>
+    <p>Analogía TypeScript:</p>
+    <pre><code>(() =&gt; {
+  const nombre = valor;
+  const otroNombre = otroValor;
+  return expresionFinal;
+})()</code></pre>
+    <p>Ejemplo Nix:</p>
+    <pre><code>let
+  tool = "jq";
+  purpose = "procesar JSON";
+in
+  "${tool} sirve para ${purpose}"</code></pre>
+    <p>Equivalente mental en TS:</p>
+    <pre><code>(() =&gt; {
+  const tool = "jq";
+  const purpose = "procesar JSON";
+  return `${tool} sirve para ${purpose}`;
+})()</code></pre>
+  </section>
+
+  <section class="card">
+    <h2>3. Attribute sets: objetos tipo JSON, pero con <code>=</code> y <code>;</code></h2>
+    <p>En Nix, un <em>attribute set</em> se parece mucho a un objeto JS/JSON:</p>
+    <pre><code>{
+  hostname = "homeserver";
+  sshPort = 22;
+  monitoring = true;
+}</code></pre>
+    <p>Analogía JS/TS:</p>
+    <pre><code>{
+  hostname: "homeserver",
+  sshPort: 22,
+  monitoring: true,
+}</code></pre>
+    <p>Diferencias importantes:</p>
+    <ul>
+      <li>Nix usa <code>=</code> en vez de <code>:</code>.</li>
+      <li>Nix termina cada atributo con <code>;</code>, no con coma.</li>
+      <li>Accedes con punto: <code>server.hostname</code>.</li>
+    </ul>
+    <pre><code>{ hostname = "homeserver"; }.hostname</code></pre>
+    <p>Resultado:</p>
+    <pre><code>"homeserver"</code></pre>
+  </section>
+
+  <section class="card">
+    <h2>4. Listas: arrays sin comas</h2>
+    <p>En Nix, las listas se escriben con espacios, no con comas:</p>
+    <pre><code>[ "curl" "git" "jq" "htop" ]</code></pre>
+    <p>Analogía TS:</p>
+    <pre><code>["curl", "git", "jq", "htop"]</code></pre>
+    <p>En tu <code>shell.nix</code>, esta lista no contiene strings, contiene paquetes:</p>
+    <pre><code>packages = with pkgs; [
+  curl
+  git
+  jq
+  htop
+];</code></pre>
+    <p>Lectura humana:</p>
+    <blockquote>Dentro del conjunto <code>pkgs</code>, toma los paquetes <code>curl</code>, <code>git</code>, <code>jq</code> y <code>htop</code>.</blockquote>
+  </section>
+
+  <section class="card">
+    <h2>5. Releer tu <code>shell.nix</code> con ojos nuevos</h2>
+    <pre><code>let
+  nixpkgs = fetchTarball "https://github.com/NixOS/nixpkgs/tarball/nixos-24.05";
+  pkgs = import nixpkgs { config = {}; overlays = []; };
+in
+
+pkgs.mkShellNoCC {
+  packages = with pkgs; [
+    curl
+    git
+    jq
+    htop
+  ];
+
+  LAB_NAME = "home-lab-reproducible";
+}</code></pre>
+    <p>Traducción ceremonial:</p>
+    <ol>
+      <li><code>nixpkgs</code>: fuente de paquetes a usar.</li>
+      <li><code>pkgs</code>: colección importada desde esa fuente.</li>
+      <li><code>pkgs.mkShellNoCC</code>: función que crea una shell sin toolchain C.</li>
+      <li>El bloque <code>{ ... }</code>: configuración/argumento para esa shell.</li>
+      <li><code>packages = [ ... ];</code>: lista de herramientas disponibles dentro de la shell.</li>
+    </ol>
+  </section>
+
+  <section class="exercise">
+    <h2>Ejercicio guiado: crea un archivo Nix que solo evalúa datos</h2>
+    <p>Crea este archivo:</p>
+    <pre><code>mkdir -p ~/estudio/linux/nix/lab/lesson-0002
+cd ~/estudio/linux/nix/lab/lesson-0002
+nano basics.nix</code></pre>
+    <p>Pega:</p>
+    <pre><code>let
+  server = {
+    hostname = "homeserver";
+    role = "lab";
+    tools = [ "curl" "git" "jq" ];
+  };
+in
+{
+  message = "${server.hostname} es un servidor de tipo ${server.role}";
+  inherit (server) tools;
+}</code></pre>
+    <p>Evalúalo:</p>
+    <pre><code>nix-instantiate --eval --strict basics.nix</code></pre>
+    <p>Resultado esperado:</p>
+    <pre><code>{ message = "homeserver es un servidor de tipo lab"; tools = [ "curl" "git" "jq" ]; }</code></pre>
+    <p class="small">Si <code>nix-instantiate</code> no existe, dime el error exacto. No haremos conjuros a ciegas.</p>
+  </section>
+
+  <section class="recall">
+    <h2>Práctica de recuperación</h2>
+    <p>Sin mirar arriba: en Nix, ¿qué dos signos reemplazan normalmente a <code>:</code> y <code>,</code> cuando escribes un objeto estilo JSON?</p>
+    <button onclick="document.querySelector('#a1').style.display='block'">Mostrar respuesta</button>
+    <p id="a1" class="answer">
+      Nix usa <code>=</code> para asignar atributos y <code>;</code> para terminar cada atributo. Ejemplo: <code>{ name = "server"; }</code>
+    </p>
+  </section>
+
+  <section class="card">
+    <h2>Siguiente paso</h2>
+    <p>
+      Cuando completes el ejercicio, vuelve al chat y dime: <code>completé la lección 0002</code>. Después sí podremos iniciar
+      el ritual de <code>flake.nix</code> con menos oscuridad sintáctica.
+    </p>
+  </section>
+
+  <section class="card small">
+    <h2>Fuentes</h2>
+    <ul>
+      <li><a href="https://nix.dev/tutorials/nix-language.html">nix.dev — Nix language basics</a></li>
+      <li><a href="https://nix.dev/manual/nix/stable/language/">Nix manual — Nix Language</a></li>
+      <li><a href="https://nix.dev/manual/nix/stable/language/constructs">Nix manual — Syntax and semantics</a></li>
+    </ul>
+  </section>
+</main>
+</body>
+</html>

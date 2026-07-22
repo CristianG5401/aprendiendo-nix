@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Referencia — Lenguaje Nix mínimo</title>
+  <link rel="stylesheet" href="../assets/teach.css">
+</head>
+<body>
+<main>
+  <p class="kicker">Referencia rápida</p>
+  <h1>Lenguaje Nix mínimo para leer <code>shell.nix</code></h1>
+
+  <section class="card">
+    <h2>Idea central</h2>
+    <p>Nix evalúa expresiones para producir valores. No pienses primero en comandos secuenciales estilo Bash.</p>
+  </section>
+
+  <section class="card">
+    <h2><code>let ... in</code></h2>
+    <pre><code>let
+  x = 1;
+  y = 2;
+in
+  x + y</code></pre>
+    <p>Analogía TS:</p>
+    <pre><code>(() =&gt; {
+  const x = 1;
+  const y = 2;
+  return x + y;
+})()</code></pre>
+  </section>
+
+  <section class="card">
+    <h2>Attribute set</h2>
+    <pre><code>{
+  hostname = "homeserver";
+  port = 22;
+}</code></pre>
+    <p>Como objeto JS, pero con <code>=</code> y <code>;</code>.</p>
+  </section>
+
+  <section class="card">
+    <h2>Lista</h2>
+    <pre><code>[ "curl" "git" "jq" ]</code></pre>
+    <p>Como array JS, pero sin comas.</p>
+  </section>
+
+  <section class="card">
+    <h2>Interpolación de strings</h2>
+    <pre><code>let name = "Nix"; in "Hola ${name}"</code></pre>
+    <p>Similar a template literals en TS: <code>`Hola ${name}`</code>.</p>
+  </section>
+
+  <section class="card">
+    <h2>Acceso con punto</h2>
+    <pre><code>{ server = { hostname = "lab"; }; }.server.hostname</code></pre>
+    <p>Similar a <code>obj.server.hostname</code>.</p>
+  </section>
+
+  <section class="card">
+    <h2>Comando de práctica</h2>
+    <pre><code>nix-instantiate --eval --strict archivo.nix</code></pre>
+    <p>Evalúa un archivo <code>.nix</code> y muestra el valor resultante.</p>
+  </section>
+</main>
+</body>
+</html>

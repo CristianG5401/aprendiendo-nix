@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>0001 — Tu primer entorno reproducible con Nix</title>
+  <link rel="stylesheet" href="../assets/teach.css">
+</head>
+<body>
+<main>
+  <p class="kicker">Lección 0001 · Nix para home labs</p>
+  <h1>Tu primer entorno reproducible con Nix</h1>
+  <p class="subtitle">Objetivo: describir un conjunto de herramientas CLI en un archivo versionable, no en tu memoria.</p>
+
+  <section class="card">
+    <h2>La idea central</h2>
+    <p>
+      En un servidor tradicional, solemos instalar herramientas con comandos imperativos:
+      <code>apt install jq curl git</code>. Eso funciona, pero meses después quizá no recuerdas exactamente
+      qué instalaste ni por qué. Nix permite mover parte de ese conocimiento a un archivo declarativo.
+    </p>
+    <p>
+      En esta primera liturgia no vamos a migrar el servidor a NixOS. Solo usaremos Nix como herramienta
+      para entrar en un entorno reproducible dentro de Ubuntu Server.
+    </p>
+  </section>
+
+  <section class="card">
+    <h2>Vocabulario mínimo</h2>
+    <ul>
+      <li><strong>Nix</strong>: package manager y lenguaje para describir paquetes/entornos.</li>
+      <li><strong>Nixpkgs</strong>: colección enorme de paquetes disponibles para Nix.</li>
+      <li><strong>shell reproducible</strong>: terminal temporal con herramientas declaradas en un archivo.</li>
+      <li><strong><code>shell.nix</code></strong>: archivo que describe qué herramientas entran en la shell.</li>
+    </ul>
+  </section>
+
+  <section class="exercise">
+    <h2>Ejercicio: crea una shell de herramientas de servidor</h2>
+    <p>Crea una carpeta para practicar:</p>
+    <pre><code>mkdir -p ~/nix-lab/lesson-0001
+cd ~/nix-lab/lesson-0001</code></pre>
+
+    <p>Dentro, crea este archivo <code>shell.nix</code>:</p>
+    <pre><code>let
+  nixpkgs = fetchTarball "https://github.com/NixOS/nixpkgs/tarball/nixos-24.05";
+  pkgs = import nixpkgs { config = {}; overlays = []; };
+in
+
+pkgs.mkShellNoCC {
+  packages = with pkgs; [
+    curl
+    git
+    jq
+    htop
+  ];
+
+  LAB_NAME = "home-lab-reproducible";
+
+  shellHook = ''
+    echo "Entorno Nix activo: $LAB_NAME"
+    echo "Herramientas disponibles: curl git jq htop"
+  '';
+}</code></pre>
+
+    <p>Entra al entorno:</p>
+    <pre><code>nix-shell</code></pre>
+
+    <p>Verifica que las herramientas están ahí:</p>
+    <pre><code>which jq
+jq --version
+echo "$LAB_NAME"</code></pre>
+  </section>
+
+  <section class="card">
+    <h2>Qué está pasando</h2>
+    <ul class="checklist">
+      <li><code>fetchTarball</code> fija una rama de Nixpkgs: aquí usamos <code>nixos-24.05</code>.</li>
+      <li><code>import nixpkgs</code> carga esa colección de paquetes.</li>
+      <li><code>pkgs.mkShellNoCC</code> crea una shell sin meter un compilador innecesario.</li>
+      <li><code>packages</code> añade herramientas al <code>PATH</code> dentro de esa shell.</li>
+      <li><code>LAB_NAME</code> se convierte en environment variable.</li>
+      <li><code>shellHook</code> ejecuta comandos al entrar en la shell.</li>
+    </ul>
+  </section>
+
+  <section class="recall">
+    <h2>Práctica de recuperación</h2>
+    <p>Antes de mirar la respuesta: ¿qué problema resuelve <code>shell.nix</code> frente a recordar comandos <code>apt install</code>?</p>
+    <button onclick="document.querySelector('#a1').style.display='block'">Mostrar respuesta</button>
+    <p id="a1" class="answer">
+      Convierte el entorno en un archivo declarativo y versionable. En vez de depender de memoria o notas sueltas,
+      puedes copiar o clonar ese archivo y reconstruir la misma shell en otra máquina.
+    </p>
+  </section>
+
+  <section class="card">
+    <h2>Tu pequeña victoria</h2>
+    <p>
+      Si este ejercicio funciona, ya tienes el primer ladrillo para tu objetivo: una forma de describir herramientas
+      de administración de servidores sin depender del estado accidental de una máquina concreta.
+    </p>
+    <p>
+      Siguiente paso sugerido: guardar esta carpeta en Git y luego aprender por qué <code>flake.nix</code> +
+      <code>flake.lock</code> dan una reproducibilidad más fuerte.
+    </p>
+  </section>
+
+  <section class="card small">
+    <h2>Fuentes</h2>
+    <ul>
+      <li><a href="https://nix.dev/tutorials/first-steps/declarative-shell.html">nix.dev — Declarative shell environments with shell.nix</a></li>
+      <li><a href="https://nixos.org/manual/nixpkgs/stable/#sec-pkgs-mkShell">Nixpkgs manual — mkShell</a></li>
+    </ul>
+    <p>Si algo no queda claro, pregúntame. Soy tu servo-instructor para esta forja de reproducibilidad.</p>
+  </section>
+</main>
+</body>
+</html>

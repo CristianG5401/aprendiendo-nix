@@ -1,0 +1,18 @@
+# Node.js dependencies
+node_modules/
+
+# Nix build outputs
+result
+result-*
+
+# direnv local state
+.direnv/
+
+# Editor temporary files
+*.swp
+*.swo
+*~
+
+# Operating system metadata
+.DS_Store
+Thumbs.db
