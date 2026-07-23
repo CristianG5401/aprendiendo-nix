@@ -51,6 +51,7 @@ docker compose exec nix sh /workspace/lab/smoke-test.sh
    - [Referencia — `shell.nix` básico](./reference/0001-shell-nix-cheatsheet.html)
    - [Referencia — lenguaje Nix mínimo](./reference/0002-nix-language-minimum-cheatsheet.html)
    - [Referencia — operadores de composición](./reference/0003-operadores-composicion-cheatsheet.html)
+   - [Referencia — funciones, argumentos e imports](./reference/0004-funciones-argumentos-imports-cheatsheet.html)
 
 6. **Consulta fuentes oficiales**
    - [RESOURCES.md](./RESOURCES.md)

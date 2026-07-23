@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Referencia — Funciones, argumentos e imports en Nix</title>
+  <link rel="stylesheet" href="../assets/teach.css">
+</head>
+<body>
+<main>
+  <p class="kicker">Referencia rápida</p>
+  <h1>Funciones, argumentos e imports</h1>
+  <p class="subtitle">Cómo leer funciones Nix y reutilizar valores entre archivos.</p>
+
+  <section class="card" id="funciones">
+    <h2>Funciones y aplicación</h2>
+    <pre><code>let
+  increment = x: x + 1;
+in
+increment 2
+# 3</code></pre>
+    <pre><code>let
+  makeAddress = host: port: "${host}:${toString port}";
+  withHost = makeAddress "homeserver";
+in
+withHost 22
+# "homeserver:22"</code></pre>
+    <ul class="checklist">
+      <li><code>x: expresión</code> recibe exactamente un argumento.</li>
+      <li><code>x: y: expresión</code> es <code>x: (y: expresión)</code>: una función que devuelve otra.</li>
+      <li><code>makeAddress "homeserver"</code> es aplicación parcial y todavía produce una función.</li>
+      <li>La aplicación se escribe con whitespace, sin paréntesis ni comas obligatorios.</li>
+    </ul>
+  </section>
+
+  <section class="card" id="argumentos">
+    <h2>Argumentos como attribute set</h2>
+    <pre><code>let
+  makeServer = { host, port ? 22 }:
+    "${host}:${toString port}";
+in
+makeServer { host = "homeserver"; }
+# "homeserver:22"</code></pre>
+    <pre><code>let
+  describe = args@{ host, port ? 22, ... }: {
+    address = "${host}:${toString port}";
+    received = args;
+  };
+in
+describe { host = "backup"; enabled = true; }
+# { address = "backup:22";
+#   received = { enabled = true; host = "backup"; }; }</code></pre>
+    <ul class="checklist">
+      <li><code>{ host, port }</code> exige esos atributos.</li>
+      <li><code>port ? 22</code> hace opcional el argumento y define su default.</li>
+      <li><code>...</code> permite atributos adicionales.</li>
+      <li><code>args@{ ... }</code> conserva el attribute set completo bajo el nombre <code>args</code>.</li>
+      <li>El default se usa en <code>address</code>, pero <code>received</code> solo contiene los atributos enviados: no materializa <code>port = 22</code>.</li>
+    </ul>
+  </section>
+
+  <section class="card" id="inherit">
+    <h2><code>inherit</code> — evitar repetir nombres</h2>
+    <pre><code>let
+  host = "homeserver";
+  port = 22;
+in
+{
+  inherit host port;
+}
+# { host = "homeserver"; port = 22; }</code></pre>
+    <pre><code>let server = { host = "lab"; port = 2222; };
+in { inherit (server) host port; }
+# { host = "lab"; port = 2222; }</code></pre>
+    <p><code>inherit host;</code> equivale a <code>host = host;</code>. <code>inherit (server) host;</code> equivale a <code>host = server.host;</code>.</p>
+  </section>
+
+  <section class="card" id="import">
+    <h2><code>import</code> — evaluar otro archivo</h2>
+    <pre><code># value.nix
+{ host = "homeserver"; port = 22; }
+
+# caller.nix
+import ./value.nix
+# devuelve el attribute set</code></pre>
+    <pre><code># make-server.nix
+{ host, port ? 22 }: "${host}:${toString port}"
+
+# caller.nix
+import ./make-server.nix { host = "homeserver"; }
+# "homeserver:22"</code></pre>
+    <p><code>import ./archivo.nix</code> devuelve el valor evaluado del archivo. Los tokens posteriores aplican ese valor si es una función.</p>
+  </section>
+
+  <section class="card">
+    <h2>Puentes con JavaScript/TypeScript</h2>
+    <ul class="checklist">
+      <li><code>x: x + 1</code> recuerda a <code>x =&gt; x + 1</code>.</li>
+      <li><code>{ host, port ? 22 }:</code> combina destructuring con un default, pero usa sintaxis Nix.</li>
+      <li><code>inherit host;</code> recuerda al object shorthand <code>{ host }</code>.</li>
+      <li><code>import</code> evalúa una expresión Nix; no es idéntico al sistema de módulos ES.</li>
+    </ul>
+  </section>
+
+  <section class="card" id="errores">
+    <h2>Errores frecuentes</h2>
+    <ul class="checklist">
+      <li>Leer <code>f a b</code> como una llamada de dos argumentos: en realidad es <code>(f a) b</code>.</li>
+      <li>Pasar atributos adicionales sin declarar <code>...</code>.</li>
+      <li>Confundir <code>port ? 22</code> de un patrón de función con <code>config ? port</code>.</li>
+      <li>Suponer que <code>import</code> siempre devuelve un attribute set; puede devolver cualquier valor Nix.</li>
+      <li>Suponer que importar una función también la ejecuta sin proporcionarle un argumento.</li>
+    </ul>
+  </section>
+
+  <section class="card small">
+    <h2>Fuente primaria</h2>
+    <p><a href="https://nix.dev/tutorials/nix-language">nix.dev — Nix language basics</a></p>
+  </section>
+
+  <nav aria-label="Referencias relacionadas">
+    <a href="./0002-nix-language-minimum-cheatsheet.html">← Valores y expresiones</a>
+    · <a href="./0003-operadores-composicion-cheatsheet.html">Operadores de composición</a>
+  </nav>
+</main>
+</body>
+</html>

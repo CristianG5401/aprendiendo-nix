@@ -9,60 +9,82 @@
 <body>
 <main>
   <p class="kicker">Referencia rápida</p>
-  <h1>Lenguaje Nix mínimo para leer <code>shell.nix</code></h1>
+  <h1>Valores y expresiones esenciales de Nix</h1>
+  <p class="subtitle">Recordatorios para leer configuraciones sin volver a estudiar la lección completa.</p>
 
-  <section class="card">
-    <h2>Idea central</h2>
-    <p>Nix evalúa expresiones para producir valores. No pienses primero en comandos secuenciales estilo Bash.</p>
+  <section class="card" id="expresiones">
+    <h2>Un archivo evalúa a un valor</h2>
+    <p>Nix es expression-oriented: cada construcción produce un valor. No describe pasos secuenciales como un script de Bash.</p>
+    <pre><code>1 + 2
+# 3</code></pre>
   </section>
 
-  <section class="card">
-    <h2><code>let ... in</code></h2>
+  <section class="card" id="let">
+    <h2><code>let ... in</code> — nombres locales</h2>
     <pre><code>let
-  x = 1;
-  y = 2;
-in
-  x + y</code></pre>
-    <p>Analogía TS:</p>
-    <pre><code>(() =&gt; {
-  const x = 1;
-  const y = 2;
-  return x + y;
-})()</code></pre>
-  </section>
-
-  <section class="card">
-    <h2>Attribute set</h2>
-    <pre><code>{
   hostname = "homeserver";
   port = 22;
+in
+  "${hostname}:${toString port}"
+# "homeserver:22"</code></pre>
+    <p>Los bindings viven en la expresión que sigue a <code>in</code>.</p>
+  </section>
+
+  <section class="card" id="valores">
+    <h2>Valores que ya conoces</h2>
+    <pre><code>{
+  enabled = true;
+  tools = [ "curl" "git" "jq" ];
+  server = { hostname = "lab"; port = 22; };
+  message = "Servidor: ${"lab"}";
 }</code></pre>
-    <p>Como objeto JS, pero con <code>=</code> y <code>;</code>.</p>
+    <ul class="checklist">
+      <li>Attribute set: usa <code>=</code> y termina cada binding con <code>;</code>.</li>
+      <li>Lista: separa elementos con whitespace, sin comas.</li>
+      <li>Interpolación: coloca una expresión dentro de <code>${...}</code>.</li>
+      <li>Selección: <code>config.server.hostname</code> accede a atributos anidados.</li>
+    </ul>
+  </section>
+
+  <section class="card" id="condicionales">
+    <h2><code>if ... then ... else</code> — elegir un valor</h2>
+    <pre><code>let
+  production = true;
+in
+  if production then "homeserver-prod" else "homeserver-dev"
+# "homeserver-prod"</code></pre>
+    <p>Es una expresión: ambas ramas producen el valor del resultado.</p>
   </section>
 
   <section class="card">
-    <h2>Lista</h2>
-    <pre><code>[ "curl" "git" "jq" ]</code></pre>
-    <p>Como array JS, pero sin comas.</p>
+    <h2>Puentes con JavaScript/TypeScript</h2>
+    <ul class="checklist">
+      <li><code>{ host = "lab"; }</code> recuerda a un object literal, pero usa <code>=</code> y <code>;</code>.</li>
+      <li><code>[ "git" "jq" ]</code> recuerda a un array, pero no usa comas.</li>
+      <li><code>if c then a else b</code> se parece más a <code>c ? a : b</code> que a un bloque <code>if</code>.</li>
+      <li><code>let ... in</code> crea una expresión con scope local; la IIFE es solo una analogía de lectura.</li>
+    </ul>
   </section>
 
-  <section class="card">
-    <h2>Interpolación de strings</h2>
-    <pre><code>let name = "Nix"; in "Hola ${name}"</code></pre>
-    <p>Similar a template literals en TS: <code>`Hola ${name}`</code>.</p>
+  <section class="card" id="errores">
+    <h2>Errores frecuentes</h2>
+    <ul class="checklist">
+      <li>Olvidar <code>in</code> después de los bindings de <code>let</code>.</li>
+      <li>Escribir comas entre elementos de una lista.</li>
+      <li>Escribir un <code>if</code> sin rama <code>else</code>.</li>
+      <li>Confundir <code>.</code> de selección con acceso tolerante a atributos ausentes.</li>
+    </ul>
   </section>
 
-  <section class="card">
-    <h2>Acceso con punto</h2>
-    <pre><code>{ server = { hostname = "lab"; }; }.server.hostname</code></pre>
-    <p>Similar a <code>obj.server.hostname</code>.</p>
+  <section class="card small">
+    <h2>Fuente primaria</h2>
+    <p><a href="https://nix.dev/tutorials/nix-language">nix.dev — Nix language basics</a></p>
   </section>
 
-  <section class="card">
-    <h2>Comando de práctica</h2>
-    <pre><code>nix-instantiate --eval --strict archivo.nix</code></pre>
-    <p>Evalúa un archivo <code>.nix</code> y muestra el valor resultante.</p>
-  </section>
+  <nav aria-label="Referencias relacionadas">
+    <a href="./0001-shell-nix-cheatsheet.html">← shell.nix básico</a>
+    · <a href="./0003-operadores-composicion-cheatsheet.html">Operadores de composición →</a>
+  </nav>
 </main>
 </body>
 </html>
