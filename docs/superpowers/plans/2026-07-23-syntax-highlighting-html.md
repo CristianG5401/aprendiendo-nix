@@ -204,14 +204,14 @@ Expected: exit code `0`, con `48` bloques clasificados y `140` elementos inline 
 
 ```bash
 for page in lessons/*.html reference/*.html; do
-  test "$(rg -c 'prism-okaidia\\.min\\.css' "$page")" -eq 1
-  test "$(rg -c 'prism\\.min\\.js' "$page")" -eq 1
-  test "$(rg -c 'prism-autoloader\\.min\\.js' "$page")" -eq 1
+  test "$(rg -c 'prism-okaidia\.min\.css' "$page")" -eq 1
+  test "$(rg -c 'prism\.min\.js' "$page")" -eq 1
+  test "$(rg -c 'prism-autoloader\.min\.js' "$page")" -eq 1
 
-  prism_css_line=$(rg -n 'prism-okaidia\\.min\\.css' "$page" | cut -d: -f1)
-  local_css_line=$(rg -n 'assets/teach\\.css' "$page" | cut -d: -f1)
-  core_line=$(rg -n 'prism\\.min\\.js' "$page" | cut -d: -f1)
-  autoloader_line=$(rg -n 'prism-autoloader\\.min\\.js' "$page" | cut -d: -f1)
+  prism_css_line=$(rg -n 'prism-okaidia\.min\.css' "$page" | cut -d: -f1)
+  local_css_line=$(rg -n 'assets/teach\.css' "$page" | cut -d: -f1)
+  core_line=$(rg -n 'prism\.min\.js' "$page" | cut -d: -f1)
+  autoloader_line=$(rg -n 'prism-autoloader\.min\.js' "$page" | cut -d: -f1)
 
   test "$prism_css_line" -lt "$local_css_line"
   test "$core_line" -lt "$autoloader_line"
