@@ -30,28 +30,9 @@ Cristian puede crear un directorio versionable que, al ejecutar un comando de Ni
 
 ## Próximo paso concreto
 
-Ejecuta esta secuencia:
+Cristian ya demostró que puede leer y traducir la base del lenguaje Nix. El siguiente paso es completar:
 
-```bash
-cd ~/estudio/linux/nix
-xdg-open lessons/0001-tu-primer-entorno-reproducible-con-nix.html
-```
+- [Lección 0003 — Componer y consultar configuraciones Nix](./lessons/0003-componer-y-consultar-configuraciones-nix.html)
+- [Referencia — Operadores de composición](./reference/0003-operadores-composicion-cheatsheet.html)
 
-Si no tienes entorno gráfico, sirve la carpeta por HTTP temporalmente:
-
-```bash
-cd ~/estudio/linux/nix
-python3 -m http.server 8000
-```
-
-Y abre desde otro navegador:
-
-```text
-http://IP_DEL_SERVIDOR:8000/lessons/0001-tu-primer-entorno-reproducible-con-nix.html
-```
-
-Cuando termines, vuelve al chat y dime:
-
-```text
-completé la lección 0001
-```
+La meta inmediata es construir una configuración efectiva de home lab combinando defaults y overrides, y consultando atributos opcionales sin romper la evaluación.

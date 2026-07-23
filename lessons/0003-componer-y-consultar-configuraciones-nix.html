@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>0003 — Componer y consultar configuraciones Nix</title>
+  <link rel="stylesheet" href="../assets/teach.css">
+</head>
+<body>
+<main>
+  <p class="kicker">Lección 0003 · Composición de configuraciones</p>
+  <h1>Componer y consultar configuraciones Nix</h1>
+  <p class="subtitle">Objetivo: combinar defaults y overrides de un home lab, y consultar atributos opcionales sin romper la evaluación.</p>
+
+  <section class="card">
+    <h2>Tu misión en esta lección</h2>
+    <p>Partirás de una configuración base y aplicarás cambios locales. Al terminar podrás explicar por qué gana cada valor y cómo ofrecer defaults seguros.</p>
+    <p><a href="../reference/0003-operadores-composicion-cheatsheet.html">Abre la referencia rápida de operadores</a>.</p>
+  </section>
+
+  <section class="recall">
+    <h2>Recuperación: <code>++</code></h2>
+    <p>Sin ejecutar Nix, predice el resultado de <code>[ "git" "curl" ] ++ [ "jq" ]</code>.</p>
+    <button onclick="document.querySelector('#a0').style.display='block'">Mostrar respuesta</button>
+    <p id="a0" class="answer"><code>[ "git" "curl" "jq" ]</code>. <code>++</code> concatena listas y conserva su orden.</p>
+  </section>
+
+  <section class="card">
+    <h2>1. <code>//</code>: defaults más overrides</h2>
+    <pre><code>let
+  baseConfig = {
+    hostname = "homeserver";
+    tools = [ "git" "curl" ];
+  };
+
+  localOverrides = {
+    hostname = "homeserver-prod";
+    tools = [ "jq" ];
+  };
+in
+  baseConfig // localOverrides</code></pre>
+    <p>El resultado contiene los atributos de ambos sets. Si un nombre aparece en los dos, gana el valor del lado derecho.</p>
+    <p>Analogía JavaScript/TypeScript:</p>
+    <pre><code>const effectiveConfig = {
+  ...baseConfig,
+  ...localOverrides,
+};</code></pre>
+    <p><strong>Límite importante:</strong> <code>//</code> es superficial. Si ambos lados tienen un atributo <code>monitoring</code> que contiene otro objeto, el valor derecho reemplaza todo <code>monitoring</code>; no mezcla recursivamente sus atributos internos.</p>
+  </section>
+
+  <section class="card">
+    <h2>2. <code>?</code>: preguntar si existe</h2>
+    <pre><code>effectiveConfig ? monitoring
+effectiveConfig ? backupTarget</code></pre>
+    <p><code>?</code> devuelve un boolean: <code>true</code> si el attribute path existe y <code>false</code> si no existe. No devuelve el valor del atributo.</p>
+  </section>
+
+  <section class="card">
+    <h2>3. <code>or</code>: seleccionar con fallback</h2>
+    <pre><code>effectiveConfig.backupTarget or "/srv/backups"</code></pre>
+    <p>Esta expresión intenta seleccionar <code>backupTarget</code>. Si no existe, produce <code>"/srv/backups"</code> en lugar de abortar la evaluación.</p>
+    <p><code>or</code> no es el operador booleano OR; forma parte de attribute selection. El OR booleano de Nix se escribe <code>||</code>.</p>
+  </section>
+
+  <section class="exercise">
+    <h2>Ejercicio: configura tu home lab</h2>
+    <p>Abre <code>lab/lesson-0003/operators.nix</code> y predice sus seis atributos antes de evaluar:</p>
+    <pre><code>let
+  baseConfig = {
+    hostname = "homeserver";
+    tools = [ "git" "curl" ];
+    monitoring = {
+      endpoint = "/metrics";
+    };
+  };
+
+  localOverrides = {
+    hostname = "homeserver-prod";
+    tools = [ "jq" ];
+  };
+
+  effectiveConfig = baseConfig // localOverrides;
+  extraTools = [ "htop" ];
+in
+{
+  hostname = effectiveConfig.hostname;
+  tools = effectiveConfig.tools ++ extraTools;
+  hasMonitoring = effectiveConfig ? monitoring;
+  hasBackupTarget = effectiveConfig ? backupTarget;
+  monitoringEndpoint = effectiveConfig.monitoring.endpoint or "/health";
+  backupTarget = effectiveConfig.backupTarget or "/srv/backups";
+}</code></pre>
+    <p>Dentro del contenedor del laboratorio, evalúa:</p>
+    <pre><code>cd /workspace/lab/lesson-0003
+nix-instantiate --eval --strict operators.nix</code></pre>
+    <p>Resultado esperado:</p>
+    <pre><code>{ backupTarget = "/srv/backups"; hasBackupTarget = false; hasMonitoring = true; hostname = "homeserver-prod"; monitoringEndpoint = "/metrics"; tools = [ "jq" "htop" ]; }</code></pre>
+  </section>
+
+  <section class="recall">
+    <h2>Comprueba tu modelo mental</h2>
+    <p>¿Por qué <code>tools</code> no conserva <code>git</code> y <code>curl</code>?</p>
+    <button onclick="document.querySelector('#a1').style.display='block'">Mostrar respuesta</button>
+    <p id="a1" class="answer">Porque <code>//</code> reemplaza superficialmente el atributo <code>tools</code>; después <code>++</code> añade <code>htop</code> a la lista reemplazante <code>[ "jq" ]</code>.</p>
+  </section>
+
+  <section class="card">
+    <h2>Siguiente paso</h2>
+    <p>Cuando completes el ejercicio, vuelve al chat y escribe <code>completé la lección 0003</code>. Incluye tu predicción y el resultado real.</p>
+    <p>Si algo no está claro, pregunta al agente antes de continuar; incluye tu predicción y el resultado real.</p>
+  </section>
+
+  <section class="card small">
+    <h2>Fuentes y navegación</h2>
+    <ul>
+      <li><a href="https://nix.dev/manual/nix/stable/language/operators.html">Nix manual — Operators</a></li>
+      <li><a href="https://nix.dev/tutorials/nix-language">nix.dev — Nix language basics</a></li>
+      <li><a href="../reference/0003-operadores-composicion-cheatsheet.html">Referencia 0003 — Operadores de composición</a></li>
+      <li><a href="0002-lectura-basica-del-lenguaje-nix.html">Volver a la lección 0002</a></li>
+    </ul>
+  </section>
+</main>
+</body>
+</html>

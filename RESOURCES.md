@@ -26,6 +26,10 @@
    - Uso: explicar `pkgs.mkShell`, `mkShellNoCC`, `packages`, `shellHook`.
    - Motivo: referencia oficial de Nixpkgs.
 
+7. [Nix manual — Operators](https://nix.dev/manual/nix/stable/language/operators.html)
+   - Uso: lección 0003 sobre attribute selection con `or`, comprobación con `?`, concatenación con `++` y actualización con `//`.
+   - Motivo: referencia oficial de sintaxis, precedencia y semántica de operadores.
+
 ## Comunidades / sabiduría práctica
 
 - [NixOS Discourse](https://discourse.nixos.org/)
