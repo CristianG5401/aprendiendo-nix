@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Referencia — Operadores de composición Nix</title>
+  <link rel="stylesheet" href="../assets/teach.css">
+</head>
+<body>
+<main>
+  <p class="kicker">Referencia rápida</p>
+  <h1>Componer y consultar configuraciones Nix</h1>
+
+  <section class="card">
+    <h2><code>//</code> — actualizar un attribute set</h2>
+    <pre><code>{ editor = "vim"; shell = "bash"; }
+// { editor = "nvim"; }</code></pre>
+    <p>El lado derecho gana cuando ambos sets contienen el mismo atributo.</p>
+    <p><strong>Importante:</strong> la actualización es superficial; un set anidado repetido se reemplaza completo.</p>
+  </section>
+
+  <section class="card">
+    <h2><code>?</code> — comprobar existencia</h2>
+    <pre><code>{ sshPort = 22; } ? sshPort
+# true</code></pre>
+    <p>Devuelve un boolean. No obtiene el valor.</p>
+  </section>
+
+  <section class="card">
+    <h2><code>or</code> — seleccionar con fallback</h2>
+    <pre><code>{ sshPort = 22; }.backupTarget or "/srv/backups"
+# "/srv/backups"</code></pre>
+    <p><code>or</code> pertenece a attribute selection: intenta seleccionar y usa el fallback si el atributo no existe.</p>
+  </section>
+
+  <section class="card">
+    <h2><code>++</code> — concatenar listas</h2>
+    <pre><code>[ "git" "curl" ] ++ [ "jq" ]
+# [ "git" "curl" "jq" ]</code></pre>
+  </section>
+
+  <section class="card">
+    <h2>Patrón reusable</h2>
+    <pre><code>let
+  effectiveConfig = defaults // overrides;
+in
+{
+  tools = effectiveConfig.tools ++ extraTools;
+  hasBackup = effectiveConfig ? backupTarget;
+  backupTarget = effectiveConfig.backupTarget or "/srv/backups";
+}</code></pre>
+  </section>
+
+  <section class="card small">
+    <h2>Fuente primaria</h2>
+    <p><a href="https://nix.dev/manual/nix/stable/language/operators.html">Nix manual — Operators</a></p>
+  </section>
+
+  <p><a href="../lessons/0003-componer-y-consultar-configuraciones-nix.html">Volver a la lección 0003</a></p>
+</main>
+</body>
+</html>
