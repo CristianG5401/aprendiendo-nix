@@ -15,12 +15,12 @@
 
   <section class="card" id="funciones">
     <h2>Funciones y aplicación</h2>
-    <pre><code>let
+    <pre><code class="language-nix">let
   increment = x: x + 1;
 in
 increment 2
 # 3</code></pre>
-    <pre><code>let
+    <pre><code class="language-nix">let
   makeAddress = host: port: "${host}:${toString port}";
   withHost = makeAddress "homeserver";
 in
@@ -36,13 +36,13 @@ withHost 22
 
   <section class="card" id="argumentos">
     <h2>Argumentos como attribute set</h2>
-    <pre><code>let
+    <pre><code class="language-nix">let
   makeServer = { host, port ? 22 }:
     "${host}:${toString port}";
 in
 makeServer { host = "homeserver"; }
 # "homeserver:22"</code></pre>
-    <pre><code>let
+    <pre><code class="language-nix">let
   describe = args@{ host, port ? 22, ... }: {
     address = "${host}:${toString port}";
     received = args;
@@ -62,7 +62,7 @@ describe { host = "backup"; enabled = true; }
 
   <section class="card" id="inherit">
     <h2><code>inherit</code> — evitar repetir nombres</h2>
-    <pre><code>let
+    <pre><code class="language-nix">let
   host = "homeserver";
   port = 22;
 in
@@ -70,7 +70,7 @@ in
   inherit host port;
 }
 # { host = "homeserver"; port = 22; }</code></pre>
-    <pre><code>let server = { host = "lab"; port = 2222; };
+    <pre><code class="language-nix">let server = { host = "lab"; port = 2222; };
 in { inherit (server) host port; }
 # { host = "lab"; port = 2222; }</code></pre>
     <p><code>inherit host;</code> equivale a <code>host = host;</code>. <code>inherit (server) host;</code> equivale a <code>host = server.host;</code>.</p>
@@ -78,13 +78,13 @@ in { inherit (server) host port; }
 
   <section class="card" id="import">
     <h2><code>import</code> — evaluar otro archivo</h2>
-    <pre><code># value.nix
+    <pre><code class="language-nix"># value.nix
 { host = "homeserver"; port = 22; }
 
 # caller.nix
 import ./value.nix
 # devuelve el attribute set</code></pre>
-    <pre><code># make-server.nix
+    <pre><code class="language-nix"># make-server.nix
 { host, port ? 22 }: "${host}:${toString port}"
 
 # caller.nix

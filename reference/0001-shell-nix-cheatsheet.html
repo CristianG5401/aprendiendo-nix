@@ -13,7 +13,7 @@
   <h1><code>shell.nix</code> básico</h1>
   <section class="card">
     <h2>Plantilla mínima</h2>
-    <pre><code>let
+    <pre><code class="language-nix">let
   nixpkgs = fetchTarball "https://github.com/NixOS/nixpkgs/tarball/nixos-24.05";
   pkgs = import nixpkgs { config = {}; overlays = []; };
 in

@@ -16,13 +16,13 @@
   <section class="card" id="expresiones">
     <h2>Un archivo evalúa a un valor</h2>
     <p>Nix es expression-oriented: cada construcción produce un valor. No describe pasos secuenciales como un script de Bash.</p>
-    <pre><code>1 + 2
+    <pre><code class="language-nix">1 + 2
 # 3</code></pre>
   </section>
 
   <section class="card" id="let">
     <h2><code>let ... in</code> — nombres locales</h2>
-    <pre><code>let
+    <pre><code class="language-nix">let
   hostname = "homeserver";
   port = 22;
 in
@@ -33,7 +33,7 @@ in
 
   <section class="card" id="valores">
     <h2>Valores que ya conoces</h2>
-    <pre><code>{
+    <pre><code class="language-nix">{
   enabled = true;
   tools = [ "curl" "git" "jq" ];
   server = { hostname = "lab"; port = 22; };
@@ -49,7 +49,7 @@ in
 
   <section class="card" id="condicionales">
     <h2><code>if ... then ... else</code> — elegir un valor</h2>
-    <pre><code>let
+    <pre><code class="language-nix">let
   production = true;
 in
   if production then "homeserver-prod" else "homeserver-dev"

@@ -39,11 +39,11 @@
   <section class="exercise">
     <h2>Ejercicio: crea una shell de herramientas de servidor</h2>
     <p>Crea una carpeta para practicar:</p>
-    <pre><code>mkdir -p ~/nix-lab/lesson-0001
+    <pre><code class="language-bash">mkdir -p ~/nix-lab/lesson-0001
 cd ~/nix-lab/lesson-0001</code></pre>
 
     <p>Dentro, crea este archivo <code>shell.nix</code>:</p>
-    <pre><code>let
+    <pre><code class="language-nix">let
   nixpkgs = fetchTarball "https://github.com/NixOS/nixpkgs/tarball/nixos-24.05";
   pkgs = import nixpkgs { config = {}; overlays = []; };
 in
@@ -65,10 +65,10 @@ pkgs.mkShellNoCC {
 }</code></pre>
 
     <p>Entra al entorno:</p>
-    <pre><code>nix-shell</code></pre>
+    <pre><code class="language-bash">nix-shell</code></pre>
 
     <p>Verifica que las herramientas están ahí:</p>
-    <pre><code>which jq
+    <pre><code class="language-bash">which jq
 jq --version
 echo "$LAB_NAME"</code></pre>
   </section>
