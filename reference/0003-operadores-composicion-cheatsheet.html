@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Referencia — Operadores de composición Nix</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.30.0/themes/prism-okaidia.min.css">
   <link rel="stylesheet" href="../assets/teach.css">
 </head>
 <body>
@@ -29,7 +30,7 @@
 
   <section class="card">
     <h2><code>//</code> — actualizar un attribute set</h2>
-    <pre><code>{ editor = "vim"; shell = "bash"; }
+    <pre><code class="language-nix">{ editor = "vim"; shell = "bash"; }
 // { editor = "nvim"; }
 # { editor = "nvim"; shell = "bash"; }</code></pre>
     <p>El lado derecho gana cuando ambos sets contienen el mismo atributo.</p>
@@ -38,27 +39,27 @@
 
   <section class="card">
     <h2><code>?</code> — comprobar existencia</h2>
-    <pre><code>{ sshPort = 22; } ? sshPort
+    <pre><code class="language-nix">{ sshPort = 22; } ? sshPort
 # true</code></pre>
     <p>Devuelve un boolean. No obtiene el valor.</p>
   </section>
 
   <section class="card">
     <h2><code>or</code> — seleccionar con fallback</h2>
-    <pre><code>{ sshPort = 22; }.backupTarget or "/srv/backups"
+    <pre><code class="language-nix">{ sshPort = 22; }.backupTarget or "/srv/backups"
 # "/srv/backups"</code></pre>
     <p><code>or</code> pertenece a attribute selection: intenta seleccionar y usa el fallback si el atributo no existe.</p>
   </section>
 
   <section class="card">
     <h2><code>++</code> — concatenar listas</h2>
-    <pre><code>[ "git" "curl" ] ++ [ "jq" ]
+    <pre><code class="language-nix">[ "git" "curl" ] ++ [ "jq" ]
 # [ "git" "curl" "jq" ]</code></pre>
   </section>
 
   <section class="card">
     <h2>Patrón reusable</h2>
-    <pre><code>let
+    <pre><code class="language-nix">let
   effectiveConfig = defaults // overrides;
 in
 {
@@ -88,5 +89,7 @@ in
     · <a href="./0004-funciones-argumentos-imports-cheatsheet.html">Funciones e imports →</a>
   </nav>
 </main>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.30.0/prism.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.30.0/plugins/autoloader/prism-autoloader.min.js"></script>
 </body>
 </html>

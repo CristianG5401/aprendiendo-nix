@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>0001 — Tu primer entorno reproducible con Nix</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.30.0/themes/prism-okaidia.min.css">
   <link rel="stylesheet" href="../assets/teach.css">
 </head>
 <body>
@@ -38,11 +39,11 @@
   <section class="exercise">
     <h2>Ejercicio: crea una shell de herramientas de servidor</h2>
     <p>Crea una carpeta para practicar:</p>
-    <pre><code>mkdir -p ~/nix-lab/lesson-0001
+    <pre><code class="language-bash">mkdir -p ~/nix-lab/lesson-0001
 cd ~/nix-lab/lesson-0001</code></pre>
 
     <p>Dentro, crea este archivo <code>shell.nix</code>:</p>
-    <pre><code>let
+    <pre><code class="language-nix">let
   nixpkgs = fetchTarball "https://github.com/NixOS/nixpkgs/tarball/nixos-24.05";
   pkgs = import nixpkgs { config = {}; overlays = []; };
 in
@@ -64,10 +65,10 @@ pkgs.mkShellNoCC {
 }</code></pre>
 
     <p>Entra al entorno:</p>
-    <pre><code>nix-shell</code></pre>
+    <pre><code class="language-bash">nix-shell</code></pre>
 
     <p>Verifica que las herramientas están ahí:</p>
-    <pre><code>which jq
+    <pre><code class="language-bash">which jq
 jq --version
 echo "$LAB_NAME"</code></pre>
   </section>
@@ -115,5 +116,7 @@ echo "$LAB_NAME"</code></pre>
     <p>Si algo no queda claro, pregúntame. Soy tu servo-instructor para esta forja de reproducibilidad.</p>
   </section>
 </main>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.30.0/prism.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.30.0/plugins/autoloader/prism-autoloader.min.js"></script>
 </body>
 </html>

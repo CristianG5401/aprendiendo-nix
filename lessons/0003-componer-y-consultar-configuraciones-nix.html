@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>0003 — Componer y consultar configuraciones Nix</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.30.0/themes/prism-okaidia.min.css">
   <link rel="stylesheet" href="../assets/teach.css">
 </head>
 <body>
@@ -27,7 +28,7 @@
 
   <section class="card">
     <h2>1. <code>//</code>: defaults más overrides</h2>
-    <pre><code>let
+    <pre><code class="language-nix">let
   baseConfig = {
     hostname = "homeserver";
     tools = [ "git" "curl" ];
@@ -41,7 +42,7 @@ in
   baseConfig // localOverrides</code></pre>
     <p>El resultado contiene los atributos de ambos sets. Si un nombre aparece en los dos, gana el valor del lado derecho.</p>
     <p>Analogía JavaScript/TypeScript:</p>
-    <pre><code>const effectiveConfig = {
+    <pre><code class="language-javascript">const effectiveConfig = {
   ...baseConfig,
   ...localOverrides,
 };</code></pre>
@@ -50,14 +51,14 @@ in
 
   <section class="card">
     <h2>2. <code>?</code>: preguntar si existe</h2>
-    <pre><code>effectiveConfig ? monitoring
+    <pre><code class="language-nix">effectiveConfig ? monitoring
 effectiveConfig ? backupTarget</code></pre>
     <p><code>?</code> devuelve un boolean: <code>true</code> si el attribute path existe y <code>false</code> si no existe. No devuelve el valor del atributo.</p>
   </section>
 
   <section class="card">
     <h2>3. <code>or</code>: seleccionar con fallback</h2>
-    <pre><code>effectiveConfig.backupTarget or "/srv/backups"</code></pre>
+    <pre><code class="language-nix">effectiveConfig.backupTarget or "/srv/backups"</code></pre>
     <p>Esta expresión intenta seleccionar <code>backupTarget</code>. Si no existe, produce <code>"/srv/backups"</code> en lugar de abortar la evaluación.</p>
     <p><code>or</code> no es el operador booleano OR; forma parte de attribute selection. El OR booleano de Nix se escribe <code>||</code>.</p>
   </section>
@@ -65,7 +66,7 @@ effectiveConfig ? backupTarget</code></pre>
   <section class="exercise">
     <h2>Ejercicio: configura tu home lab</h2>
     <p>Abre <code>lab/lesson-0003/operators.nix</code> y predice sus seis atributos antes de evaluar:</p>
-    <pre><code>let
+    <pre><code class="language-nix">let
   baseConfig = {
     hostname = "homeserver";
     tools = [ "git" "curl" ];
@@ -91,10 +92,10 @@ in
   backupTarget = effectiveConfig.backupTarget or "/srv/backups";
 }</code></pre>
     <p>Dentro del contenedor del laboratorio, evalúa:</p>
-    <pre><code>cd /workspace/lab/lesson-0003
+    <pre><code class="language-bash">cd /workspace/lab/lesson-0003
 nix-instantiate --eval --strict operators.nix</code></pre>
     <p>Resultado esperado:</p>
-    <pre><code>{ backupTarget = "/srv/backups"; hasBackupTarget = false; hasMonitoring = true; hostname = "homeserver-prod"; monitoringEndpoint = "/metrics"; tools = [ "jq" "htop" ]; }</code></pre>
+    <pre><code class="language-plaintext">{ backupTarget = "/srv/backups"; hasBackupTarget = false; hasMonitoring = true; hostname = "homeserver-prod"; monitoringEndpoint = "/metrics"; tools = [ "jq" "htop" ]; }</code></pre>
   </section>
 
   <section class="recall">
@@ -120,5 +121,7 @@ nix-instantiate --eval --strict operators.nix</code></pre>
     </ul>
   </section>
 </main>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.30.0/prism.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.30.0/plugins/autoloader/prism-autoloader.min.js"></script>
 </body>
 </html>
